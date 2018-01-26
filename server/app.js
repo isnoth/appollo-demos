@@ -8,8 +8,11 @@ var bodyParser = require('body-parser');
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools');
 
+const { db } = require('./service/mongo')
+const {ObjectId}  =require('mongodb')
+
 // Some fake data
-const books = [
+let books = [
   {
     title: "Harry Potter and the Sorcerer's stone",
     author: 'J.K. Rowling',
@@ -23,11 +26,24 @@ const books = [
 // The GraphQL schema in string form
 const typeDefs = `
   type Query {
-    books: [Book]
+    books(title: String): [Book]
+  }
+
+  type Mutation{
+    createBook (
+      title: String!
+      author: String
+    ): Book
+
+    updateBook(
+      _id: String!
+      author: String
+    ): Book
   }
 
   type Book {
-    title: String,
+    _id: String
+    title: String
     author: String
   }
 
@@ -35,15 +51,25 @@ const typeDefs = `
 
 // The resolvers
 const resolvers = {
-  Query: { books: () => {
-    return new Promise((resolve, reject)=>{
-      setTimeout(()=>{
-        resolve(books)
-      }, 3000)
-    })
+  Query: { books: (root, args, context) => {
+    const params  = args.title?{title: args.title}:{}
+    return db.find('book', params )
     //return books
   }},
+  Mutation: {
+    createBook(root, {title, author}){
+      return db.add('book', {title, author})
+      //books.push({title, author})
+      //return {title, author}
+    },
+    updateBook(root, {_id, author}){
+      return db.update('book', {_id: ObjectId(_id)}, {author})
+      //books.push({title, author})
+      //return {title, author}
+    }
+  }
 };
+
 
 // Put together a schema
 const schema = makeExecutableSchema({
