@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var cors = require('cors')
 
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 const { makeExecutableSchema } = require('graphql-tools');
@@ -38,6 +39,7 @@ const typeDefs = `
     updateBook(
       _id: String!
       author: String
+      title: String
     ): Book
   }
 
@@ -62,8 +64,10 @@ const resolvers = {
       //books.push({title, author})
       //return {title, author}
     },
-    updateBook(root, {_id, author}){
-      return db.update('book', {_id: ObjectId(_id)}, {author})
+    updateBook(root, args){
+      const _id = ObjectId(args._id)
+      delete(args._id)
+      return db.update('book', {_id}, args)
       //books.push({title, author})
       //return {title, author}
     }
@@ -97,6 +101,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors())
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
