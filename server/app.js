@@ -28,6 +28,9 @@ let books = [
 const typeDefs = `
   type Query {
     books(title: String): [Book]
+
+    book(_id: String!): Book
+
   }
 
   type Mutation{
@@ -57,6 +60,10 @@ const resolvers = {
     const params  = args.title?{title: args.title}:{}
     return db.find('book', params )
     //return books
+  }, book: (root, args, context)=>{
+    const _id  = ObjectId(args._id)
+    return db.find('book', {_id} )
+    .then(data=>data[0])
   }},
   Mutation: {
     createBook(root, {title, author}){

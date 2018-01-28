@@ -73,7 +73,6 @@ class DbHandler{
   }
 
   find(collection, query={}){
-    console.log('find this:', this)
     return find(this.db, collection, query)
   }
 
