@@ -44,9 +44,9 @@ function findOneAndUpdate(db, collection, query, data){
     return c.findOneAndUpdate(query, {$set: data})
 }
 
-function rm(db, collection){
+function deleteOne(db, collection, params){
   const c= db.collection(collection)
-  return c.deleteMany()
+  return c.deleteOne(params)
 }
 
 
@@ -80,6 +80,10 @@ class DbHandler{
    return findOneAndUpdate(this.db, collection, query, update )
   }
 
+  deleteOne(collection, query){
+    return  deleteOne(this.db, collection, query)
+  }
+
 }
 
 
@@ -88,5 +92,5 @@ const db = new DbHandler(url)
 module.exports.connectToMongo = connectToMongo
 module.exports.add = add
 module.exports.find = find
-module.exports.rm = rm
+module.exports.deleteOne = deleteOne
 module.exports.db = db

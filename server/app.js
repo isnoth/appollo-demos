@@ -44,6 +44,10 @@ const typeDefs = `
       author: String
       title: String
     ): Book
+
+    deleteBook(
+      _id: String!
+    ): Book
   }
 
   type Book {
@@ -77,7 +81,14 @@ const resolvers = {
       return db.update('book', {_id}, args)
       //books.push({title, author})
       //return {title, author}
-    }
+    },
+    deleteBook(root, args){
+      const _id = ObjectId(args._id)
+      return db.deleteOne('book', {_id})
+      //books.push({title, author})
+      //return {title, author}
+    },
+
   }
 };
 
